@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.DS_Store
+uploads/
+*.stl
+*.obj
+*.gcode
+.vscode/
+.idea/
+coverage/
+.cache/
+frontend/node_modules/
+frontend/dist/
+backend/dist/
