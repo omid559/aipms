@@ -68,7 +68,34 @@ router.post('/', upload.single('model'), async (req, res) => {
 router.delete('/:filename', async (req, res) => {
   try {
     const filename = req.params.filename;
-    const filePath = path.join(__dirname, '../../../uploads', filename);
+
+    // Security: Prevent path traversal attacks
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
+
+    // Validate filename format (timestamp-random.ext)
+    const validFilenamePattern = /^\d+-\d+\.(stl|obj|3mf|gcode)$/i;
+    if (!validFilenamePattern.test(filename)) {
+      return res.status(400).json({ error: 'Invalid filename format' });
+    }
+
+    const uploadDir = path.join(__dirname, '../../../uploads');
+    const filePath = path.join(uploadDir, filename);
+
+    // Security: Ensure file is within uploads directory
+    const resolvedPath = path.resolve(filePath);
+    const resolvedUploadDir = path.resolve(uploadDir);
+    if (!resolvedPath.startsWith(resolvedUploadDir)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Check if file exists
+    try {
+      await fs.access(filePath);
+    } catch {
+      return res.status(404).json({ error: 'File not found' });
+    }
 
     await fs.unlink(filePath);
 

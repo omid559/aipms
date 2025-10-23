@@ -25,6 +25,22 @@ function STLModel({ url }: { url: string }) {
       // Compute normals for proper lighting
       geometry.computeVertexNormals()
     }
+
+    // Cleanup: dispose geometry when component unmounts or URL changes
+    return () => {
+      if (geometry) {
+        geometry.dispose()
+      }
+      if (meshRef.current) {
+        if (meshRef.current.material) {
+          if (Array.isArray(meshRef.current.material)) {
+            meshRef.current.material.forEach((mat) => mat.dispose())
+          } else {
+            meshRef.current.material.dispose()
+          }
+        }
+      }
+    }
   }, [geometry])
 
   return (
@@ -50,6 +66,22 @@ function WireframeModel({ url }: { url: string }) {
         const center = new THREE.Vector3()
         boundingBox.getCenter(center)
         geometry.translate(-center.x, -center.y, -center.z)
+      }
+    }
+
+    // Cleanup: dispose geometry when component unmounts or URL changes
+    return () => {
+      if (geometry) {
+        geometry.dispose()
+      }
+      if (meshRef.current) {
+        if (meshRef.current.material) {
+          if (Array.isArray(meshRef.current.material)) {
+            meshRef.current.material.forEach((mat) => mat.dispose())
+          } else {
+            meshRef.current.material.dispose()
+          }
+        }
       }
     }
   }, [geometry])
