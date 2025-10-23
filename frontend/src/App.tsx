@@ -1,17 +1,27 @@
 import { useState } from 'react'
-import { Upload, Settings, Sparkles, FileText, Printer } from 'lucide-react'
+import { Upload, Settings, Sparkles, FileText, Printer, Shield } from 'lucide-react'
 import FileUploader from './components/FileUploader'
 import ModelViewer from './components/ModelViewer'
 import SettingsPanel from './components/SettingsPanel'
 import ProfileSelector from './components/ProfileSelector'
 import AIOptimizer from './components/AIOptimizer'
 import GCodeGenerator from './components/GCodeGenerator'
+import AdminPanel from './components/AdminPanel'
 import { useStore } from './store/useStore'
 import './App.css'
 
 function App() {
   const [activeTab, setActiveTab] = useState<'upload' | 'settings' | 'preview'>('upload')
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
   const { uploadedFile, slicingSettings } = useStore()
+
+  // Check if user is admin (simple check - in production use proper auth)
+  const isAdmin = () => {
+    const token = localStorage.getItem('token');
+    // You can decode JWT and check role here
+    // For now, just check if token exists
+    return !!token;
+  }
 
   return (
     <div className="app">
@@ -25,9 +35,21 @@ function App() {
                 <p>سیستم مدیریت پرینت سه‌بعدی با هوش مصنوعی</p>
               </div>
             </div>
+            {isAdmin() && (
+              <button
+                onClick={() => setShowAdminPanel(true)}
+                className="admin-button"
+                title="پنل مدیریت"
+              >
+                <Shield size={20} />
+                <span>پنل مدیریت</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
+
+      {showAdminPanel && <AdminPanel onClose={() => setShowAdminPanel(false)} />}
 
       <div className="container">
         <div className="tabs">

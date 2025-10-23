@@ -23,12 +23,14 @@ export default function ProfileSelector() {
       setMaterials(materialsData.materials)
       setPrinters(printersData.printers)
 
-      // Set defaults
+      // Set defaults (prefer default marked items)
       if (materialsData.materials.length > 0 && !selectedMaterial) {
-        setSelectedMaterial(materialsData.materials[0])
+        const defaultMaterial = materialsData.materials.find((m: any) => m.isDefault) || materialsData.materials[0];
+        setSelectedMaterial(defaultMaterial)
       }
       if (printersData.printers.length > 0 && !selectedPrinter) {
-        setSelectedPrinter(printersData.printers[0])
+        const defaultPrinter = printersData.printers.find((p: any) => p.isDefault) || printersData.printers[0];
+        setSelectedPrinter(defaultPrinter)
       }
     } catch (error) {
       console.error('Failed to load profiles:', error)
