@@ -122,6 +122,47 @@ export default function GCodeGenerator() {
             </div>
           </div>
 
+          {result.orientationData && (
+            <div className="orientation-info">
+              <h3>🤖 بهینه‌سازی جهت‌گیری با هوش مصنوعی</h3>
+              <div className="orientation-score">
+                <div className="score-badge">
+                  <span className="score-value">{result.orientationData.bestOrientation.score.toFixed(1)}</span>
+                  <span className="score-label">/100</span>
+                </div>
+                <div className="score-details">
+                  <div className="score-item">
+                    <span>حجم ساپورت:</span>
+                    <strong>{result.orientationData.bestOrientation.supportVolume.toFixed(2)} mm³</strong>
+                  </div>
+                  <div className="score-item">
+                    <span>سطح اورهنگ:</span>
+                    <strong>{result.orientationData.bestOrientation.overhangArea.toFixed(2)} mm²</strong>
+                  </div>
+                  <div className="score-item">
+                    <span>پایداری:</span>
+                    <strong>{(result.orientationData.bestOrientation.stability * 100).toFixed(1)}%</strong>
+                  </div>
+                  <div className="score-item">
+                    <span>کیفیت سطح:</span>
+                    <strong>{(result.orientationData.bestOrientation.surfaceQuality * 100).toFixed(1)}%</strong>
+                  </div>
+                </div>
+              </div>
+              <div className="ai-analysis">
+                {result.orientationData.analysis}
+              </div>
+              <div className="rotation-info">
+                <strong>چرخش اعمال شده:</strong>
+                <div className="rotation-values">
+                  <span>X: {(result.orientationData.bestOrientation.rotation.x * 180 / Math.PI).toFixed(1)}°</span>
+                  <span>Y: {(result.orientationData.bestOrientation.rotation.y * 180 / Math.PI).toFixed(1)}°</span>
+                  <span>Z: {(result.orientationData.bestOrientation.rotation.z * 180 / Math.PI).toFixed(1)}°</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="metadata-grid">
             <div className="metadata-item">
               <span>تعداد لایه:</span>
