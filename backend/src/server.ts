@@ -10,6 +10,7 @@ import slicingRouter from './routes/slicing.js';
 import profileRouter from './routes/profile.js';
 import aiRouter from './routes/ai.js';
 import learningRouter from './routes/learning.js';
+import authRouter from './routes/auth.js';
 import {
   apiLimiter,
   uploadLimiter,
@@ -21,6 +22,14 @@ import {
   requestTimeout,
 } from './middleware/security.js';
 import fileCleanupService from './services/fileCleanupService.js';
+import {
+  initSentry,
+  sentryRequestHandler,
+  sentryTracingHandler,
+  sentryErrorHandler,
+  metrics,
+  performHealthCheck,
+} from './services/monitoring.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +38,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize Sentry for error tracking
+initSentry(app);
 
 // MongoDB Connection with proper error handling
 const connectDB = async () => {
@@ -65,6 +77,15 @@ mongoose.connection.on('error', (err) => {
 
 // Trust proxy (important for rate limiting behind reverse proxy)
 app.set('trust proxy', 1);
+
+// Sentry request handler - must be first
+app.use(sentryRequestHandler());
+
+// Sentry tracing handler - must be after request handler
+app.use(sentryTracingHandler());
+
+// Prometheus metrics tracking
+app.use(metrics.trackHttpRequest());
 
 // Security Middleware
 app.use(helmet({
@@ -105,23 +126,35 @@ app.use('/uploads', express.static(path.join(__dirname, '../../uploads'), {
 }));
 
 // Routes with specific rate limiting
+app.use('/api/auth', apiLimiter, authRouter);
 app.use('/api/upload', uploadLimiter, uploadRouter);
 app.use('/api/slicing', apiLimiter, slicingRouter);
 app.use('/api/profile', apiLimiter, profileRouter);
 app.use('/api/ai', aiLimiter, aiRouter);
 app.use('/api/learning', apiLimiter, learningRouter);
 
-// Health check (no rate limiting)
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'AIPMS Backend is running',
-    timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    learningEnabled: mongoose.connection.readyState === 1,
-    version: '1.0.0',
-  });
+// Health check endpoint (comprehensive)
+app.get('/api/health', async (req, res) => {
+  try {
+    const healthData = await performHealthCheck();
+    const statusCode = healthData.status === 'ok' ? 200 : healthData.status === 'degraded' ? 200 : 503;
+    res.status(statusCode).json(healthData);
+  } catch (error) {
+    res.status(503).json({
+      status: 'down',
+      message: 'Health check failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 });
+
+// Simple health check for load balancers
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// Prometheus metrics endpoint
+app.get('/metrics', metrics.getMetricsHandler());
 
 // 404 handler
 app.use((req, res) => {
@@ -131,6 +164,9 @@ app.use((req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Sentry error handler - must be before other error handlers
+app.use(sentryErrorHandler());
 
 // Error logging
 app.use(errorLogger);

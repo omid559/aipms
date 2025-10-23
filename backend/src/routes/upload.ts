@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
+import { optionalAuth, checkQuota } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,10 +43,17 @@ const upload = multer({
 });
 
 // Upload 3D model file
-router.post('/', upload.single('model'), async (req, res) => {
+router.post('/', optionalAuth, checkQuota('uploads'), checkQuota('storage'), upload.single('model'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Update quota for authenticated users
+    if (req.user) {
+      req.user.quota.usedUploads += 1;
+      req.user.quota.usedStorageBytes += req.file.size;
+      await req.user.save();
     }
 
     res.json({
