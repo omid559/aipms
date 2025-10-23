@@ -11,6 +11,7 @@ import profileRouter from './routes/profile.js';
 import aiRouter from './routes/ai.js';
 import learningRouter from './routes/learning.js';
 import authRouter from './routes/auth.js';
+import adminRouter from './routes/admin/index.js';
 import {
   apiLimiter,
   uploadLimiter,
@@ -127,6 +128,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../../uploads'), {
 
 // Routes with specific rate limiting
 app.use('/api/auth', apiLimiter, authRouter);
+app.use('/api/admin', apiLimiter, adminRouter);
 app.use('/api/upload', uploadLimiter, uploadRouter);
 app.use('/api/slicing', apiLimiter, slicingRouter);
 app.use('/api/profile', apiLimiter, profileRouter);
