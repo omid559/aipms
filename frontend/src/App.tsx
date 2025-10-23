@@ -5,6 +5,7 @@ import ModelViewer from './components/ModelViewer'
 import SettingsPanel from './components/SettingsPanel'
 import ProfileSelector from './components/ProfileSelector'
 import AIOptimizer from './components/AIOptimizer'
+import GCodeGenerator from './components/GCodeGenerator'
 import { useStore } from './store/useStore'
 import './App.css'
 
@@ -95,29 +96,7 @@ function App() {
 
           {activeTab === 'preview' && (
             <div className="card">
-              <h2 style={{ marginBottom: '20px' }}>پیش‌نمایش و تولید G-Code</h2>
-              <div className="preview-info">
-                <div className="info-item">
-                  <span>ارتفاع لایه:</span>
-                  <strong>{slicingSettings?.layerHeight || 0.2} mm</strong>
-                </div>
-                <div className="info-item">
-                  <span>پر شدگی:</span>
-                  <strong>{slicingSettings?.infillDensity || 20}%</strong>
-                </div>
-                <div className="info-item">
-                  <span>سرعت پرینت:</span>
-                  <strong>{slicingSettings?.printSpeed || 50} mm/s</strong>
-                </div>
-                <div className="info-item">
-                  <span>دما:</span>
-                  <strong>{slicingSettings?.printingTemperature || 200}°C</strong>
-                </div>
-              </div>
-              <button className="btn btn-success" style={{ marginTop: '20px', width: '100%' }}>
-                <FileText size={20} />
-                تولید G-Code
-              </button>
+              <GCodeGenerator />
             </div>
           )}
         </div>

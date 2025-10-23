@@ -50,7 +50,17 @@ export const optimizeWithAI = async (data: {
 export const generateGCode = async (data: {
   filePath: string
   settings: any
+  printerProfile: any
+  generate3MF?: boolean
 }) => {
   const response = await api.post('/slicing/generate-gcode', data)
   return response.data
+}
+
+export const downloadGCode = (filename: string) => {
+  window.open(`/api/slicing/download/gcode/${filename}`, '_blank')
+}
+
+export const download3MF = (filename: string) => {
+  window.open(`/api/slicing/download/3mf/${filename}`, '_blank')
 }
