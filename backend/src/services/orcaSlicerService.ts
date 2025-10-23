@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import archiver from 'archiver';
 import { SlicingSettings, PrinterProfile } from '../types/slicing.js';
 import { OrcaSlicerConfigGenerator } from './orcaSlicerConfig.js';
+import orientationOptimizer, { OrientationResult } from './orientationOptimizer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +21,8 @@ export interface SlicingResult {
     filamentLength: string;
     filamentWeight: string;
   };
+  orientationData?: OrientationResult;
+  rotatedModelPath?: string;
 }
 
 export class OrcaSlicerService {
@@ -61,7 +64,8 @@ export class OrcaSlicerService {
     modelPath: string,
     settings: SlicingSettings,
     printerProfile: PrinterProfile,
-    generate3MF: boolean = true
+    generate3MF: boolean = true,
+    optimizeOrientation: boolean = true
   ): Promise<SlicingResult> {
     try {
       // Ensure output directory exists
@@ -75,6 +79,44 @@ export class OrcaSlicerService {
       const threeMFOutputPath = generate3MF
         ? path.join(this.outputDir, `${basename}_${timestamp}.3mf`)
         : undefined;
+
+      // AI-based orientation optimization
+      let orientationData: OrientationResult | undefined;
+      let actualModelPath = modelPath;
+      let rotatedModelPath: string | undefined;
+
+      if (optimizeOrientation && path.extname(modelPath).toLowerCase() === '.stl') {
+        console.log('🤖 AI: Analyzing optimal orientation for the model...');
+        try {
+          orientationData = await orientationOptimizer.optimizeOrientation(
+            modelPath,
+            settings.material,
+            {
+              x: printerProfile.buildVolumeX,
+              y: printerProfile.buildVolumeY,
+              z: printerProfile.buildVolumeZ,
+            }
+          );
+
+          console.log('✅ AI: Optimal orientation found');
+          console.log(`   ${orientationData.analysis}`);
+
+          // Apply rotation to model
+          rotatedModelPath = path.join(this.outputDir, `${basename}_rotated_${timestamp}.stl`);
+          await orientationOptimizer.applyRotationToFile(
+            modelPath,
+            rotatedModelPath,
+            orientationData.appliedRotation
+          );
+
+          // Use rotated model for slicing
+          actualModelPath = rotatedModelPath;
+          console.log('🔄 Using optimally oriented model for slicing');
+        } catch (error) {
+          console.warn('⚠️  Orientation optimization failed, using original orientation:', error);
+          // Continue with original model if optimization fails
+        }
+      }
 
       // Generate configuration file
       await this.configGenerator.generateConfig(settings, printerProfile, configPath);
@@ -95,7 +137,7 @@ export class OrcaSlicerService {
 
       // Build OrcaSlicer command
       const command = this.buildSlicerCommand(
-        modelPath,
+        actualModelPath,
         configPath,
         gcodeOutputPath,
         threeMFOutputPath
@@ -124,6 +166,8 @@ export class OrcaSlicerService {
         gcodePath: gcodeOutputPath,
         threeMFPath: threeMFOutputPath,
         metadata,
+        orientationData,
+        rotatedModelPath,
       };
     } catch (error) {
       console.error('Slicing error:', error);
@@ -351,7 +395,8 @@ M84 ; disable motors
     modelPath: string,
     settings: SlicingSettings,
     printer: PrinterProfile,
-    outputPath: string
+    outputPath: string,
+    orientationData?: OrientationResult
   ): Promise<void> {
     try {
       // Create a simple 3MF package (ZIP archive)
@@ -369,6 +414,15 @@ M84 ; disable motors
       archive.append(contentTypes, { name: '[Content_Types].xml' });
 
       // Add 3D model metadata
+      const orientationMetadata = orientationData
+        ? `  <metadata name="AI Orientation">Optimized by AIPMS AI</metadata>
+  <metadata name="Orientation Score">${orientationData.bestOrientation.score.toFixed(2)}/100</metadata>
+  <metadata name="Support Volume">${orientationData.bestOrientation.supportVolume.toFixed(2)}mm³</metadata>
+  <metadata name="Rotation X">${(orientationData.bestOrientation.rotation.x * 180 / Math.PI).toFixed(1)}°</metadata>
+  <metadata name="Rotation Y">${(orientationData.bestOrientation.rotation.y * 180 / Math.PI).toFixed(1)}°</metadata>
+  <metadata name="Rotation Z">${(orientationData.bestOrientation.rotation.z * 180 / Math.PI).toFixed(1)}°</metadata>`
+        : '';
+
       const modelXML = `<?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">
   <metadata name="Title">AIPMS Sliced Model</metadata>
@@ -380,6 +434,7 @@ M84 ; disable motors
   <metadata name="Temperature">${settings.printingTemperature}°C</metadata>
   <metadata name="Bed Temperature">${settings.buildPlateTemperature}°C</metadata>
   <metadata name="Printer">${printer.name}</metadata>
+${orientationMetadata}
 </model>`;
       archive.append(modelXML, { name: '3D/3dmodel.model' });
 

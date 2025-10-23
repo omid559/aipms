@@ -155,3 +155,116 @@
   text-align: center;
   font-weight: 600;
 }
+
+/* Orientation Optimization Styles */
+.orientation-info {
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+}
+
+.orientation-info h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: white;
+  text-align: center;
+}
+
+.orientation-score {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.score-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.score-value {
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.score-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  flex: 1;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.score-item span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.score-item strong {
+  font-size: 16px;
+  color: white;
+}
+
+.ai-analysis {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  white-space: pre-line;
+  border-right: 4px solid rgba(255, 255, 255, 0.5);
+}
+
+.rotation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.rotation-info strong {
+  color: white;
+  font-size: 14px;
+}
+
+.rotation-values {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rotation-values span {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 600;
+}

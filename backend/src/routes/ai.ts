@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { AIOptimizer } from '../services/aiOptimizer.js';
 import { ModelAnalysis, MaterialProfile, PrinterProfile, SlicingSettings } from '../types/slicing.js';
+import { optionalAuth, checkQuota } from '../middleware/auth.js';
 
 const router = Router();
 const aiOptimizer = new AIOptimizer();
 
 // Optimize slicing settings using AI
-router.post('/optimize', async (req, res) => {
+router.post('/optimize', optionalAuth, checkQuota('ai'), async (req, res) => {
   try {
     const { modelAnalysis, materialProfile, printerProfile, userPreferences } = req.body;
 
@@ -22,6 +23,12 @@ router.post('/optimize', async (req, res) => {
       printerProfile as PrinterProfile,
       userPreferences as Partial<SlicingSettings>
     );
+
+    // Update AI quota for authenticated users
+    if (req.user) {
+      req.user.quota.usedAICalls += 1;
+      await req.user.save();
+    }
 
     res.json({
       success: true,

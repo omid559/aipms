@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { SlicingSettings, PrinterProfile } from '../types/slicing.js';
 import { ModelAnalyzer } from '../services/modelAnalyzer.js';
 import { OrcaSlicerService } from '../services/orcaSlicerService.js';
+import orientationOptimizer from '../services/orientationOptimizer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,10 +45,51 @@ router.post('/analyze', async (req, res) => {
   }
 });
 
+// AI-powered orientation optimization
+router.post('/optimize-orientation', async (req, res) => {
+  try {
+    const { filePath, materialType, printerProfile } = req.body;
+
+    if (!filePath) {
+      return res.status(400).json({ error: 'File path is required' });
+    }
+
+    // Convert relative path to absolute
+    const absolutePath = filePath.startsWith('/')
+      ? filePath
+      : path.join(__dirname, '../../../', filePath);
+
+    console.log('🤖 AI: Optimizing orientation for model:', absolutePath);
+
+    // Use AI to optimize orientation
+    const orientationResult = await orientationOptimizer.optimizeOrientation(
+      absolutePath,
+      materialType,
+      printerProfile ? {
+        x: printerProfile.buildVolumeX,
+        y: printerProfile.buildVolumeY,
+        z: printerProfile.buildVolumeZ,
+      } : undefined
+    );
+
+    res.json({
+      success: true,
+      orientationData: orientationResult,
+      message: 'Orientation optimized successfully'
+    });
+  } catch (error) {
+    console.error('Orientation optimization error:', error);
+    res.status(500).json({
+      error: 'Failed to optimize orientation',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Generate G-code from settings using OrcaSlicer
 router.post('/generate-gcode', async (req, res) => {
   try {
-    const { filePath, settings, printerProfile, generate3MF } = req.body;
+    const { filePath, settings, printerProfile, generate3MF, optimizeOrientation } = req.body;
 
     if (!filePath || !settings || !printerProfile) {
       return res.status(400).json({
@@ -67,7 +109,8 @@ router.post('/generate-gcode', async (req, res) => {
       absolutePath,
       settings as SlicingSettings,
       printerProfile as PrinterProfile,
-      generate3MF !== false
+      generate3MF !== false,
+      optimizeOrientation !== false // Default to true
     );
 
     res.json({
@@ -75,6 +118,8 @@ router.post('/generate-gcode', async (req, res) => {
       gcodePath: result.gcodePath,
       threeMFPath: result.threeMFPath,
       metadata: result.metadata,
+      orientationData: result.orientationData,
+      rotatedModelPath: result.rotatedModelPath,
       message: 'G-code generated successfully'
     });
   } catch (error) {
