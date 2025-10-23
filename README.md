@@ -39,9 +39,13 @@ A professional web application for managing and optimizing 3D file slicing with 
 - قابلیت ایجاد و ذخیره پروفایل‌های سفارشی
 
 ### 📊 پیش‌نمایش و تولید G-Code
-- تولید G-Code بهینه
-- پیش‌نمایش اطلاعات پرینت
-- تخمین زمان و مصرف مواد
+- **تولید G-Code واقعی با OrcaSlicer** ✨ جدید!
+- **تولید فایل پروژه 3MF** ✨ جدید!
+- **تحلیل واقعی فایل STL** (حجم، سطح، bounding box) ✨ جدید!
+- **تشخیص خودکار overhang، thin wall، bridging** ✨ جدید!
+- پیش‌نمایش اطلاعات دقیق پرینت
+- تخمین دقیق زمان و مصرف مواد
+- دانلود فایل‌های G-code و 3MF
 
 ## 🏗️ معماری سیستم / System Architecture
 
@@ -87,6 +91,7 @@ AIPMS/
 - Node.js 20+
 - npm یا yarn
 - کلید API OpenAI (برای بهینه‌سازی AI)
+- **OrcaSlicer** (اختیاری - برای تولید G-code واقعی) ⭐ پیشنهاد می‌شود!
 
 ### مراحل نصب / Installation Steps
 
@@ -113,6 +118,13 @@ OPENAI_API_KEY=your_openai_api_key_here
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=100000000
 NODE_ENV=development
+ORCA_SLICER_PATH=orca-slicer  # مسیر OrcaSlicer
+```
+
+**⚠️ مهم:** برای فعال‌سازی قابلیت تولید G-code واقعی، OrcaSlicer را نصب کنید:
+```bash
+# راهنمای نصب کامل را ببینید:
+cat ORCA_SLICER_SETUP.md
 ```
 
 4. **اجرای برنامه / Run application**
@@ -223,6 +235,9 @@ Backend API: http://localhost:3000
 - **TypeScript** - Type safety
 - **Multer** - File upload handling
 - **OpenAI API** - AI optimization
+- **OrcaSlicer** - Professional slicing engine ✨ جدید!
+- **node-stl** - STL file parsing ✨ جدید!
+- **Archiver** - 3MF file generation ✨ جدید!
 
 ### Frontend
 - **React 18** - UI library

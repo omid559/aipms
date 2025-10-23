@@ -1,0 +1,262 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--dark);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--gray);
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: var(--gray-lighter);
+}
+
+.feedback-types {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  background: var(--gray-lighter);
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.type-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid transparent;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--gray);
+}
+
+.type-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.type-btn.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.quick-feedback,
+.detailed-feedback,
+.image-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rating-stars p {
+  font-size: 14px;
+  color: var(--gray);
+  margin: 0 12px 0 0;
+}
+
+.star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--gray-light);
+  transition: all 0.2s;
+}
+
+.star:hover {
+  color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.star.filled {
+  color: #fbbf24;
+}
+
+.feedback-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.feedback-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--dark);
+}
+
+.issues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.issue-chip {
+  padding: 8px 12px;
+  border: 2px solid var(--gray-light);
+  background: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.issue-chip:hover {
+  border-color: var(--primary);
+}
+
+.issue-chip.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.upload-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--gray-lighter);
+  border-radius: 12px;
+}
+
+.upload-info h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--dark);
+}
+
+.upload-info p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray);
+  max-width: 400px;
+}
+
+.selected-images {
+  background: var(--gray-lighter);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.selected-images p {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--danger);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.remove-btn:hover {
+  background: #fee2e2;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--gray-light);
+}
+
+.modal-footer .btn {
+  min-width: 100px;
+}
