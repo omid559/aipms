@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.GAPGPT_API_KEY || '',
+  baseURL: process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.app/v1',
 });
 
 export interface PrintQualityAnalysis {
@@ -31,7 +32,7 @@ export class VisionAnalyzer {
       const prompt = this.buildAnalysisPrompt(context);
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o', // GPT-4 Turbo with vision
+        model: process.env.GAPGPT_VISION_MODEL || 'deepseek-reasoner', // Note: Vision support depends on GapGPT capabilities
         messages: [
           {
             role: 'system',
@@ -89,7 +90,7 @@ export class VisionAnalyzer {
       }
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: process.env.GAPGPT_VISION_MODEL || 'deepseek-reasoner',
         messages: [
           {
             role: 'system',
@@ -159,7 +160,7 @@ Return your analysis in this JSON format:
 }`;
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: process.env.GAPGPT_VISION_MODEL || 'deepseek-reasoner',
         messages: [
           {
             role: 'system',
@@ -320,7 +321,7 @@ Return JSON:
 }`;
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: process.env.GAPGPT_VISION_MODEL || 'deepseek-reasoner',
         messages: [
           {
             role: 'system',
