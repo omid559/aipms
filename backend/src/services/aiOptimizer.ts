@@ -2,7 +2,8 @@ import OpenAI from 'openai';
 import { SlicingSettings, ModelAnalysis, MaterialProfile, PrinterProfile } from '../types/slicing.js';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.GAPGPT_API_KEY || '',
+  baseURL: process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.app/v1',
 });
 
 export class AIOptimizer {
@@ -24,7 +25,7 @@ export class AIOptimizer {
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: process.env.GAPGPT_MODEL || 'deepseek-reasoner',
         messages: [
           {
             role: 'system',

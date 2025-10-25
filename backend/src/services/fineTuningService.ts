@@ -4,7 +4,8 @@ import { FineTuningJob, ModelPerformance } from '../models/learning.js';
 import { TrainingDataManager } from './trainingDataManager.js';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.GAPGPT_API_KEY || '',
+  baseURL: process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.app/v1',
 });
 
 export class FineTuningService {

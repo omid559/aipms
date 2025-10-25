@@ -5,7 +5,8 @@ import * as path from 'path';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.GAPGPT_API_KEY || '',
+  baseURL: process.env.GAPGPT_BASE_URL || 'https://api.gapgpt.app/v1',
 });
 
 export interface OrientationScore {
@@ -504,7 +505,7 @@ Format:
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: process.env.GAPGPT_MODEL || 'deepseek-reasoner',
         messages: [
           {
             role: 'system',
